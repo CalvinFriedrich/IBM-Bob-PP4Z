@@ -1,0 +1,29 @@
+# Ignore all PowerPoint presentations
+*.pptx
+*.ppt
+
+# Ignore temporary and cache directories
+.bob/
+.bobz/
+tmp_tracks/
+build_js.py
+styles_ref.css
+
+# Ignore sub-projects and demo folders (only keep lab-web-build and Banking_Lab.md)
+bobz-cobol-demo/
+ITERGO/
+Bsp Code für Bobz/
+
+# Ignore workspace-specific HTML documents
+*-handoff.html
+ibm-bob-premium-package-for-z-curriculum.html
+
+# Standard ignore patterns
+.DS_Store
+Thumbs.db
+node_modules/
+dist/
+build/
+*.log
+*.tmp
+Bsp Code f*
