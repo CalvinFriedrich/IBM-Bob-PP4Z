@@ -31,8 +31,8 @@ jobs:
       - name: Upload Workspace Static Site Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload only the banking-lab folder as the website root
-          path: 'banking-lab'
+          # Upload the repository root (since banking-lab is now the root)
+          path: '.'
 
       - name: Deploy to GitHub Pages
         id: deployment
