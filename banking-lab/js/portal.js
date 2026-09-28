@@ -77,8 +77,8 @@
   if (window.bankingLabMarkdown) {
     parseAndRenderBankingLab(window.bankingLabMarkdown);
   } else {
-    // Fallback: Fetch Banking_Lab.md from the root directory if we are running in a web server
-    fetch('../Banking_Lab.md')
+    // Fallback: Fetch Banking_Lab.md from the same directory if we are running in a web server
+    fetch('Banking_Lab.md')
       .then(function (res) {
         if (!res.ok) {
           throw new Error('HTTP Error: ' + res.status);

@@ -19,7 +19,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}lab-web-build/index.html
+      url: ${{ steps.deployment.outputs.page_url }}index.html
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -31,8 +31,8 @@ jobs:
       - name: Upload Workspace Static Site Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload the entire repository, so lab-web-build/ can access Banking_Lab.md
-          path: '.'
+          # Upload only the banking-lab folder as the website root
+          path: 'banking-lab'
 
       - name: Deploy to GitHub Pages
         id: deployment
