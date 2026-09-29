@@ -129,7 +129,7 @@
         // Strip "Exercise X:" or "Exercise X: " prefix from the card title
         var cleanTitle = titleText.replace(/^Exercise\s+\d+\s*:\s*/i, '').trim();
         
-        // Check if this is Exercise 12, so we can split it into focused sub-steps (a, b, c, d)
+        // Check if this is Exercise 12, so we can wrap all sub-parts (A-D) inside one cohesive card container
         if (exerciseNum === "12") {
           // Exercise 12 contains introductory context, followed by:
           // ### Part A: Implementation Planning
@@ -141,18 +141,46 @@
           var parts = restOfBody.split(/(?=###\s+Part\s+[A-D]\s*:\s*)/gi);
           var introText = parts[0].trim(); // Holds Objective, Context, and Exploratory prompt
           
+          // Compile the introductory markdown content to HTML
+          var compiledHTML = marked.parse(introText);
+          
+          // Start constructing the sub-accordion container
+          compiledHTML += '<div class="use-cases">';
+          
+          // Loop through the 4 sub-parts and construct interactive collapsible accordion sections
           for (var pIdx = 1; pIdx <= 4 && pIdx < parts.length; pIdx++) {
             var partContent = parts[pIdx].trim();
             var partLine = partContent.split('\n')[0].trim();
             var partTitleText = partLine.replace(/^###\s+Part\s+[A-D]\s*:\s*/i, '').trim();
             
-            // Re-construct clean sub-body containing intro context + this specific step
-            var subBody = introText + "\n\n---\n\n" + partContent;
+            // Extract Part Letter (A, B, C, D)
+            var partLetter = String.fromCharCode(64 + pIdx); // 1->'A', 2->'B', etc.
             
-            // Map pIdx (1 to 4) to letters (a, b, c, d)
-            var letter = String.fromCharCode(96 + pIdx); // 1->'a', 2->'b', etc.
-            renderCard(exerciseNum + letter, partTitleText, subBody);
+            // Parse this part's specific body markdown (removing its header line)
+            var partBodyMarkdown = partContent.substring(partContent.indexOf('\n') + 1).trim();
+            var partBodyHTML = marked.parse(partBodyMarkdown);
+            
+            compiledHTML += `
+              <div class="use-case">
+                <div class="use-case-header">
+                  <div class="uc-num">${partLetter}</div>
+                  <div class="uc-title">${partTitleText}</div>
+                  <div class="uc-arrow" aria-hidden="true">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5l5 5 5-5"/></svg>
+                  </div>
+                </div>
+                <div class="uc-body">
+                  <div class="uc-body-inner">
+                    ${partBodyHTML}
+                  </div>
+                </div>
+              </div>
+            `;
           }
+          compiledHTML += '</div>';
+          
+          // Render Exercise 12 as a single unified card, passing our pre-compiled HTML block directly
+          renderCard(exerciseNum, cleanTitle, null, compiledHTML);
         } else {
           renderCard(exerciseNum, cleanTitle, restOfBody);
         }
@@ -168,7 +196,7 @@
   /**
    * Render single expandable card
    */
-  function renderCard(number, title, bodyMarkdown) {
+  function renderCard(number, title, bodyMarkdown, compiledHTMLOverride) {
     var card = document.createElement('div');
     
     // Dynamically assign track-X groupings based on Exercise Numbers:
@@ -198,30 +226,32 @@
     
     card.className = 'bubble-card ' + trackClass;
 
-    // Parse Markdown body into HTML via Marked library
-    var bodyHTML = marked.parse(bodyMarkdown);
+    // Parse Markdown body into HTML via Marked library, or use pre-compiled HTML override
+    var bodyHTML = compiledHTMLOverride ? compiledHTMLOverride : marked.parse(bodyMarkdown || '');
 
     // Extract appropriate mode (Agent, Z Code, Z Architect, Plan, Ask) to render badges
-    var modeMatch = bodyMarkdown.match(/Bob Mode to Use[^\n]*\n+[\s*-]*\s*([^\n]+)/i);
     var modeBadgeHTML = '';
-    if (modeMatch && modeMatch[1]) {
-      var rawMode = modeMatch[1].trim().toLowerCase();
-      var modeName = "Agent Mode";
-      var modeClass = "mode-agent";
-      if (rawMode.includes('z code') || rawMode.includes('z-code')) {
-        modeName = "Z Code Mode";
-        modeClass = "mode-zcode";
-      } else if (rawMode.includes('z architect') || rawMode.includes('z-architect') || rawMode.includes('architect')) {
-        modeName = "Z Architect Mode";
-        modeClass = "mode-zarch";
-      } else if (rawMode.includes('plan')) {
-        modeName = "Plan Mode";
-        modeClass = "mode-plan";
-      } else if (rawMode.includes('ask')) {
-        modeName = "Ask Mode";
-        modeClass = "mode-agent"; // General styling
+    if (bodyMarkdown) {
+      var modeMatch = bodyMarkdown.match(/Bob Mode to Use[^\n]*\n+[\s*-]*\s*([^\n]+)/i);
+      if (modeMatch && modeMatch[1]) {
+        var rawMode = modeMatch[1].trim().toLowerCase();
+        var modeName = "Agent Mode";
+        var modeClass = "mode-agent";
+        if (rawMode.includes('z code') || rawMode.includes('z-code')) {
+          modeName = "Z Code Mode";
+          modeClass = "mode-zcode";
+        } else if (rawMode.includes('z architect') || rawMode.includes('z-architect') || rawMode.includes('architect')) {
+          modeName = "Z Architect Mode";
+          modeClass = "mode-zarch";
+        } else if (rawMode.includes('plan')) {
+          modeName = "Plan Mode";
+          modeClass = "mode-plan";
+        } else if (rawMode.includes('ask')) {
+          modeName = "Ask Mode";
+          modeClass = "mode-agent"; // General styling
+        }
+        modeBadgeHTML = `<span class="mode-badge ${modeClass}">💻 ${modeName}</span>`;
       }
-      modeBadgeHTML = `<span class="mode-badge ${modeClass}">💻 ${modeName}</span>`;
     }
 
     var labelStr = '';
@@ -312,6 +342,32 @@
         }
       });
     }
+
+    // Interactive sub-accordion click toggle delegate inside cards
+    document.addEventListener('click', function (e) {
+      var header = e.target.closest('.use-case-header');
+      if (!header) return;
+      var uc = header.closest('.use-case');
+      if (!uc) return;
+
+      var isOpen = uc.classList.contains('uc-open');
+      
+      // Close other sub-accordions in this card
+      var parentSection = uc.closest('.use-cases');
+      if (parentSection) {
+        parentSection.querySelectorAll('.use-case').forEach(function (otherUc) {
+          otherUc.classList.remove('uc-open');
+        });
+      }
+
+      if (!isOpen) {
+        uc.classList.add('uc-open');
+        // Smooth scroll sub-accordion into view
+        setTimeout(function () {
+          uc.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 150);
+      }
+    });
 
     // Delegated Event Listener for Clipboard Copy buttons
     document.addEventListener('click', function (e) {
