@@ -1,4 +1,4 @@
-name: Deploy Banking Lab Portal to GitHub Pages
+name: Deploy Banking Lab to GitHub Pages
 
 on:
   push:
