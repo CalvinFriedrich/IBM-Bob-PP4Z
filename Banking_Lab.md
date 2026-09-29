@@ -31,6 +31,7 @@
 
 ## Exercise 0: Lab Preparation
 [↩️](#-table-of-contents)
+
 ### 🎯 Objective
 
 Retrieve the CBSA application source code from GitHub and prepare the workspace for the lab.
