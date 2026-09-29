@@ -307,7 +307,9 @@ Now that the workspace is initialized and you have a detailed inventory, you nee
 /z-coding-standards-skill-builder
 ```
 
-Reply **Yes** when Bob proposes to include ZCodeScan in the skill.
+> 📂 **Directory selection:** When Bob asks which directory to scan for coding standards analysis, select **`src/base/` (Programs, Copybooks and BMS-Maps)**.
+>
+> 🔍 **ZCodeScan:** When Bob asks whether to include ZCodeScan validation instructions in the new skill, select or reply **Yes**. This embeds automated code-quality checks directly into the skill so Bob can run ZCodeScan validations as part of every standards review.
 
 ### ⚙️ What Bob Does Automatically
 
