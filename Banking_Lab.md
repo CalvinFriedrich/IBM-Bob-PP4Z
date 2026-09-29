@@ -269,6 +269,7 @@ Generate a complete inventory of the CBSA application, with for each program, th
 Bob queries the metadata database using `execute_sql_query` and generates a comprehensive inventory document in the `docs/` directory, respecting the naming conventions defined in Exercise 2 (for example, **`docs/CBSA-inv-application-inventory.md`**).
 
 The generated document includes:
+
 - **Executive summary**: Key statistics and high-level breakdown of application components
 - **Component inventory**: Detailed listing of COBOL programs, their designated roles, and types (batch vs. online)
 - **Dependency mapping**: Associated copybooks, BMS screens, Db2 tables (with access modes), VSAM files, queues, and called programs
@@ -323,6 +324,7 @@ At the end of Bob's output, you will find examples on how to activate this new s
 Bob generates a tailored coding standards skill packaged at **`.bob/skills/cbsa-coding-standards/SKILL.md`**, along with detailed reference files in the `.bob/skills/cbsa-coding-standards/references/` sub-directory.
 
 The generated skill encapsulates:
+
 - **Application patterns**: Program structure, division layouts, and standard linkage conventions
 - **Naming standards**: Prefixing and formatting rules for variables, paragraphs, and sections
 - **Error handling practices**: Standard CICS RESP/RESP2 evaluation and ABNDPROC routing routines
@@ -340,6 +342,7 @@ verify @src/base/cobol_src/BNK1CAC.cbl is respecting cbsa coding standards
 ```
 
 For specific lines of code only:
+
 - Either select a code block, then **Right Click > IBM Bob > Improve code**
 - Or use the prompt:
 ```text
@@ -392,6 +395,7 @@ Bob queries the local metadata database and scans program linkage information (C
 ### ✅ Expected Outcome
 
 Bob generates a Markdown file in the `graph/` directory (for example, **`graph/CBSA-archi-program-call-graph.md`**) containing:
+
 - A rendered Mermaid diagram illustrating the program call relationships across the application
 - A textual overview of key call paths (presentation programs → controllers → business services → utilities)
 - ... and more
@@ -438,6 +442,7 @@ The workflow automatically saves each generated document to the workspace.
 ### ✅ Expected Outcome
 
 Bob automatically creates three distinct Markdown documents in the `docs/explain/` directory:
+
 - **`docs/explain/developer_BANKDATA.md`**: Technical focus containing low-level paragraph flows, variable descriptions, VSAM/Db2 I/O operations, error codes, and maintenance considerations.
 - **`docs/explain/business_BANKDATA.md`**: Functional focus describing high-level business purposes, customer/account initialization rules, test data generation parameters, and domain logic without technical syntax.
 - **`docs/explain/architect_BANKDATA.md`**: System-level focus covering architectural component roles, integration points with Db2 tables and VSAM datasets, execution prerequisites, and batch design patterns.
@@ -452,6 +457,7 @@ Bob automatically creates three distinct Markdown documents in the `docs/explain
 - **Speed and coverage over manual efforts**: Generating complete documentation with diagrams and data dependencies takes minutes instead of days of manual analysis, making it easy to regenerate whenever the code evolves.
 
 > 💡 **Where Role-Tailored Documentation Delivers Value:**
+>
 > - **Onboarding & Knowledge Transfer:** Rapidly brings new team members up to speed on unfamiliar legacy modules without pulling senior developers away from active work.
 > - **Maintenance & Modernization:** Provides architects and developers with accurate dependency and parameter mappings before planning code refactoring or migration.
 > - **Audit & Compliance:** Gives business and compliance analysts clear, accessible traceability into initialization rules and data models directly extracted from source.
@@ -565,6 +571,7 @@ Create a markdown formatted report on all of the possible enhancements that coul
 Bob conducts a comprehensive code review of `BNK1CAC.cbl` and generates a prioritized enhancement report in `docs/BNK1CAC/` (e.g. **`docs/BNK1CAC/BNK1CAC-analysis-enhancements.md`**).
 
 The report identifies and categorizes key findings such as:
+
 - **Correctness & Bugs**: An incorrect time string construction where `WS-TIME-NOW-GRP-MM` is used twice in the `STRING` statement building `ABND-TIME` (resulting in `HH:MM:MM` instead of `HH:MM:SS`).
 - **Code Duplication & Refactoring**: Abend handler boilerplate code repeated across five different sections (`A010`, `RM010`, `CAD010`, `SM010`, `STM010`) that can be consolidated into a single routine, saving over 150 lines of duplicate code.
 - **Complexity & Input Validation**: Overly complex manual digit-by-digit `INSPECT` logic used for interest rate and overdraft validations spanning over 100 lines.
@@ -598,6 +605,7 @@ Z Code mode excels at pattern analysis and extracting business rules embedded in
 ### 📝 Context
 
 SORTCODE is a critical element:
+
 - 6-digit code identifying the bank branch
 - Used in all tables as a composite key
 - Current fixed value: 987654
@@ -630,6 +638,7 @@ How is the SORTCODE variable used in the application?
 ### ✅ Expected Outcome
 
 Bob analyzes references across programs and explains how `SORTCODE` is utilized throughout CBSA:
+
 - **Definition**: Originates in `SORTCODE.cpy` as a hardcoded 6-digit constant (`987654`).
 - **Core service**: Exposed authoritatively via the `GETSCODE` service program.
 - **Runtime usage patterns**: Used for composite primary key construction in DB2 queries and VSAM browse operations (`INQACC`, `INQACCCU`), input validation (`UPDACC`, `DBCRFUN`), record stamping upon creation (`CREACC`, `CRECUST`), and CICS named counter scoping.
@@ -646,6 +655,7 @@ What is the architectural importance of SORTCODE?
 ### ✅ Expected Outcome
 
 Bob synthesizes cross-program evidence and architectural context to explain the broader role of `SORTCODE`:
+
 - **Single-tenancy & partitioning**: It acts as the partition key for the entire application, scoping every customer, account, and transaction record to a single branch.
 - **Cross-cutting reach**: Directly influences the core business logic across inquiry, creation, update, deletion, and transaction programs, as well as persistent DB2 tables (`ACCOUNT`, `PROCTRAN`) and VSAM datasets (`CUSTOMER`).
 - **Modernization implications**: Serves as a direct precursor to change impact analysis — showing that transitioning from a single hardcoded sort code to a multi-branch architecture requires fundamental data model and program modifications across the entire application.
@@ -692,6 +702,7 @@ Analyze the impact of changing SORTCODE to support multiple bank branches.
 Bob generates an architecture impact analysis report.
 
 The report provides a comprehensive architectural evaluation:
+
 - **Executive Summary & Scope**: Clear classification of in-scope components (all 13 core runtime COBOL programs referencing `SORTCODE`, DB2 tables, VSAM datasets, CICS named counters) vs. out-of-scope presentation pass-through callers.
 - **Architectural Reach & Dependency Mapping**: Breakdown of how `SORTCODE` permeates data structures (`ACCOUNT` composite key, `CUSTOMER` VSAM key prefix, CICS named counter scoping).
 - **Migration & Implementation Strategies**: Analysis of candidate approaches (e.g., runtime parameterization vs. environment routing) and data migration scenarios (preserving existing records vs. clean-slate).
@@ -744,6 +755,7 @@ The documentation must:
 Bob generates an end-user operational document in the `docs/` directory respecting the naming rules defined in Exercise 2 (for example, **`docs/CBSA-docu-teller-account-inquiry-journey.md`**).
 
 The generated document includes:
+
 - **Multi-Path Consultation Overview**: Clear breakdown of account inquiry routes depending on available customer data (e.g., lookup by Customer Number, full profile inquiry, or direct account lookup).
 - **Simulated 3270 Terminal Screens**: Accurate ASCII visual layouts of the Main Menu (`BNK1MA`) and Accounts for Customers screen (`BNK1ACC`) directly derived from BMS map definitions.
 - **Teller Step-by-Step Guidance**: Clear instructions on entering 10-digit customer identifiers, navigating screen fields, reading account lists (sort codes, account types, available vs. actual balances), and using function keys (`F3=Exit`, `F12=Cancel`).
@@ -755,6 +767,7 @@ The generated document includes:
 - **Bridging Technical Code to Business Documentation**: Bob reads BMS screen maps, program control flows, and COMMAREA definitions to generate user-friendly operational manuals without requiring manual translation from technical specs.
 - **Simulated Terminal Views**: Screen mockups and keystroke navigation paths are automatically derived from source assets, reducing the need for manual screenshot gathering.
 - **Adaptability across Stakeholder Needs**: Complements technical and architectural outputs by delivering business-level documentation for operational and front-office teams.
+
 ---
 
 ## Exercise 12: Email Search Implementation
@@ -769,6 +782,7 @@ Design, plan, and implement an end-to-end new feature in the CBSA application: e
 The business wants to modernize the CBSA banking application by allowing customers to be identified by their email address rather than exclusively relying on a 10-digit customer number.
 
 To implement this feature safely and maintain system compatibility, the process follows a structured four-part development lifecycle:
+
 - **Part A (Z Architect)**: Architecture & Implementation Planning
 - **Part B (Z Code)**: Data Structure Modification
 - **Part C (Z Code)**: Search Program Development
@@ -809,6 +823,7 @@ Create a detailed implementation plan to enable customer search by email address
 Bob analyzes the application architecture and generates a structured implementation plan.
 
 The generated plan outlines:
+
 - **Executive summary & business objectives**: Functional goal of adding email-based customer lookup alongside existing search modes
 - **Architecture & component design**: Specification of the new `INQEMAIL.cbl` CICS search subprogram and its COMMAREA interface (`INQEMAIL.cpy`)
 - **Data model modifications**: Required updates to customer record copybooks (`CUSTOMER.cpy`) and transaction COMMAREAs to accommodate email fields and verification flags
@@ -843,6 +858,7 @@ According to the implementation plan, update the CUSTOMER data structures.
 Bob executes the data model changes outlined in your implementation plan by modifying existing copybooks and generating any required new copybooks in `src/base/cobol_copy/` (e.g. `CUSTOMER.cpy`, `INQCUST.cpy`, `CRECUST.cpy`, `UPDCUST.cpy`, `INQEMAIL.cpy`, or `CUSTEML.cpy`).
 
 Typical updates include:
+
 - **Customer Record Layout (`CUSTOMER.cpy`) / Table Definitions**: Adding an email field definition (and optional verification status flags), while preserving layout integrity or adjusting filler bytes.
 - **Interface COMMAREAs (`INQCUST.cpy`, `CRECUST.cpy`, `UPDCUST.cpy`)**: Extending customer service communication areas with email input/output fields.
 - **New Search COMMAREA (`INQEMAIL.cpy`)**: Defining the communication contract for the new `INQEMAIL` subprogram (e.g., input email query field, returned customer identifier, response codes, and status messages).
@@ -875,12 +891,14 @@ Create the INQEMAIL program according to the implementation plan
 #### ✅ Expected Outcome
 
 Bob generates the new CICS search program at **`src/base/cobol_src/INQEMAIL.cbl`** implementing the functionality specified in the implementation plan:
+
 - **Interface & Linkage**: Includes `COPY INQEMAIL` for its input/output COMMAREA interface and references the relevant customer data structures.
 - **Search Logic**: Implements the lookup routine according to your architecture choices (e.g. querying a new `CUSTOMER_EMAIL` DB2 table with embedded SQL, or searching via VSAM index, then linking to `INQCUST`).
 - **Input Validation**: Verifies email formatting, length, and mandatory presence before initiating datastore lookups.
 - **CICS Return Code & Error Handling**: Evaluates CICS response codes (`DFHRESP`), returns standardized response codes/messages via the COMMAREA, and routes unexpected system failures to the `ABNDPROC` error handler.
 
 > 💡 **Behind the Scenes Observations:**
+>
 > - **Design Alignment:** The exact SQL queries, VSAM commands, and validation routines in `INQEMAIL.cbl` directly reflect the architecture selected in your plan from Part A.
 > - **Context Efficiency:** With an implementation plan and workspace rules in place, prompts can remain concise without needing to repeat low-level field positions or copybook lists.
 > - **Standards & Automated Review:** Bob automatically applies the previously loaded CBSA coding standards skill and spawns a background code review subagent to inspect the generated COBOL for syntax, alignment, and compliance before presenting the result.
@@ -909,6 +927,7 @@ Verify the syntax of @src/base/cobol_src/INQEMAIL.cbl
 #### ✅ Expected Outcome
 
 Bob performs a comprehensive static syntax and structural verification of `INQEMAIL.cbl`, reporting on:
+
 - **COBOL Division Structure**: Verifies that `IDENTIFICATION`, `ENVIRONMENT`, `DATA`, and `PROCEDURE` divisions are properly declared and ordered.
 - **Copybook & Linkage Resolution**: Confirms that copybook references (e.g. `COPY INQEMAIL`, `COPY ABNDINFO`, `COPY CUSTOMER`/`CUSTEML`) resolve cleanly in `src/base/cobol_copy/`.
 - **Variable Declarations & Types**: Checks that all referenced variables and host fields are declared with consistent `PIC` types and initialized where necessary.
