@@ -129,7 +129,33 @@
         // Strip "Exercise X:" or "Exercise X: " prefix from the card title
         var cleanTitle = titleText.replace(/^Exercise\s+\d+\s*:\s*/i, '').trim();
         
-        renderCard(exerciseNum, cleanTitle, restOfBody);
+        // Check if this is Exercise 12, so we can split it into focused sub-steps (a, b, c, d)
+        if (exerciseNum === "12") {
+          // Exercise 12 contains introductory context, followed by:
+          // ### Part A: Implementation Planning
+          // ### Part B: Data Structure Modification
+          // ### Part C: Search Program Development
+          // ### Part D: Program Syntax Verification
+          
+          // Split the body into the intro section and the 4 parts
+          var parts = restOfBody.split(/(?=###\s+Part\s+[A-D]\s*:\s*)/gi);
+          var introText = parts[0].trim(); // Holds Objective, Context, and Exploratory prompt
+          
+          for (var pIdx = 1; pIdx <= 4 && pIdx < parts.length; pIdx++) {
+            var partContent = parts[pIdx].trim();
+            var partLine = partContent.split('\n')[0].trim();
+            var partTitleText = partLine.replace(/^###\s+Part\s+[A-D]\s*:\s*/i, '').trim();
+            
+            // Re-construct clean sub-body containing intro context + this specific step
+            var subBody = introText + "\n\n---\n\n" + partContent;
+            
+            // Map pIdx (1 to 4) to letters (a, b, c, d)
+            var letter = String.fromCharCode(96 + pIdx); // 1->'a', 2->'b', etc.
+            renderCard(exerciseNum + letter, partTitleText, subBody);
+          }
+        } else {
+          renderCard(exerciseNum, cleanTitle, restOfBody);
+        }
       } else if (firstLine.toLowerCase().includes('## summary') || firstLine.toLowerCase().includes('## conclusion') || firstLine.toLowerCase().includes('## 🎓') || firstLine.toLowerCase().includes('## 📚')) {
         renderCard(null, titleText, restOfBody);
       }

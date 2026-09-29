@@ -808,7 +808,7 @@ a.ntb-action-card:hover .ntb-action-arrow {
 }
 
 .bubble-card.open .card-detail {
-  max-height: 2000px; /* Adjust as necessary to fit long exercises */
+  max-height: 9999px; /* Replicated large-scale safe height to prevent any text clipping */
   border-top-color: var(--border-color);
 }
 
