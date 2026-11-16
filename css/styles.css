@@ -791,10 +791,16 @@ a.ntb-action-card:hover .ntb-action-arrow {
 
 /* Card Detail Panel (Expanded Content) */
 .card-detail {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease-out;
   border-top: 1px solid transparent;
+}
+
+.card-detail-inner {
+  overflow: hidden;
+  padding: 0 24px;
+  transition: padding 0.35s ease-out;
 }
 
 .bubble-card.open {
@@ -808,11 +814,11 @@ a.ntb-action-card:hover .ntb-action-arrow {
 }
 
 .bubble-card.open .card-detail {
-  max-height: 9999px; /* Replicated large-scale safe height to prevent any text clipping */
+  grid-template-rows: 1fr;
   border-top-color: var(--border-color);
 }
 
-.card-detail-inner {
+.bubble-card.open .card-detail-inner {
   padding: 24px;
 }
 
@@ -1049,9 +1055,16 @@ a.ntb-action-card:hover .ntb-action-arrow {
 }
 
 .uc-body {
-  max-height: 0;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease-out;
+  border-top: 1px solid transparent;
+}
+
+.uc-body-inner {
   overflow: hidden;
-  transition: max-height 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+  padding: 0 20px;
+  transition: padding 0.3s ease-out;
 }
 
 /* Expanded Sub-Accordion State */
@@ -1066,11 +1079,11 @@ a.ntb-action-card:hover .ntb-action-arrow {
 }
 
 .use-case.uc-open .uc-body {
-  max-height: 2000px; /* Safe expanded height for sub-parts */
-  border-top: 1px solid var(--border-color);
+  grid-template-rows: 1fr;
+  border-top-color: var(--border-color);
 }
 
-.uc-body-inner {
+.use-case.uc-open .uc-body-inner {
   padding: 20px;
 }
 
