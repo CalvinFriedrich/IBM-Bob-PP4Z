@@ -317,11 +317,12 @@
         cards.forEach(function (c) { c.classList.remove('open'); });
         if (!isOpen) {
           card.classList.add('open');
-          setTimeout(function () {
-            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            // Refresh stars heights as document expands
+          // Wait for DOM layout to settle after closing previous cards, then scroll smoothly to the top of the newly opened card
+          requestAnimationFrame(function () {
+            var cardTop = card.getBoundingClientRect().top + window.pageYOffset - 24;
+            window.scrollTo({ top: Math.max(0, cardTop), behavior: 'smooth' });
             if (c) resizeStars();
-          }, 150);
+          });
         }
       });
     });
@@ -362,10 +363,11 @@
 
       if (!isOpen) {
         uc.classList.add('uc-open');
-        // Smooth scroll sub-accordion into view
-        setTimeout(function () {
-          uc.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 150);
+        // Smooth scroll sub-accordion into view with comfortable offset
+        requestAnimationFrame(function () {
+          var ucTop = uc.getBoundingClientRect().top + window.pageYOffset - 24;
+          window.scrollTo({ top: Math.max(0, ucTop), behavior: 'smooth' });
+        });
       }
     });
 
