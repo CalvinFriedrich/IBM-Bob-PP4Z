@@ -314,10 +314,27 @@
 
       summary.addEventListener('click', function () {
         var isOpen = card.classList.contains('open');
-        cards.forEach(function (c) { c.classList.remove('open'); });
+        
+        // Calculate the height of any open card positioned above the clicked card that will collapse
+        var collapsedHeightAbove = 0;
+        cards.forEach(function (c) {
+          if (c.classList.contains('open') && c !== card) {
+            // Check if this open card is positioned before the clicked card in the DOM
+            if (c.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_FOLLOWING) {
+              var detail = c.querySelector('.card-detail');
+              if (detail) {
+                collapsedHeightAbove += detail.getBoundingClientRect().height;
+              }
+            }
+          }
+          c.classList.remove('open');
+        });
+
         if (!isOpen) {
           card.classList.add('open');
-          var targetTop = card.getBoundingClientRect().top + window.pageYOffset - 24;
+          // Current top minus the height that will disappear above it
+          var currentTop = card.getBoundingClientRect().top + window.pageYOffset;
+          var targetTop = currentTop - collapsedHeightAbove - 24;
           window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
           if (c) resizeStars();
         }
@@ -350,18 +367,28 @@
 
       var isOpen = uc.classList.contains('uc-open');
       
-      // Close other sub-accordions in this card
+      // Close other sub-accordions in this card and calculate height removed above
+      var collapsedUcHeightAbove = 0;
       var parentSection = uc.closest('.use-cases');
       if (parentSection) {
         parentSection.querySelectorAll('.use-case').forEach(function (otherUc) {
+          if (otherUc.classList.contains('uc-open') && otherUc !== uc) {
+            if (otherUc.compareDocumentPosition(uc) & Node.DOCUMENT_POSITION_FOLLOWING) {
+              var ucBody = otherUc.querySelector('.uc-body');
+              if (ucBody) {
+                collapsedUcHeightAbove += ucBody.getBoundingClientRect().height;
+              }
+            }
+          }
           otherUc.classList.remove('uc-open');
         });
       }
 
       if (!isOpen) {
         uc.classList.add('uc-open');
-        var ucTop = uc.getBoundingClientRect().top + window.pageYOffset - 24;
-        window.scrollTo({ top: Math.max(0, ucTop), behavior: 'smooth' });
+        var currentUcTop = uc.getBoundingClientRect().top + window.pageYOffset;
+        var targetUcTop = currentUcTop - collapsedUcHeightAbove - 24;
+        window.scrollTo({ top: Math.max(0, targetUcTop), behavior: 'smooth' });
       }
     });
 
